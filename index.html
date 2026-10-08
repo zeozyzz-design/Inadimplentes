@@ -259,6 +259,31 @@ footer{margin-top:24px;padding-top:15px;border-top:1px solid var(--border);font-
     </div>
   </details>
 
+  <details class="card" id="envioCard">
+    <summary>Envio automático de e-mails</summary>
+    <div class="card-b">
+      <div class="maps">
+        <label>Endereço do serviço de envio
+          <input type="text" id="epUrl" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off">
+        </label>
+        <label>Chave de acesso
+          <input type="text" id="epToken" placeholder="chave combinada com o serviço" autocomplete="off">
+        </label>
+        <label>Cópia para
+          <input type="text" id="epCopia" placeholder="financeiro@saojoaoferroeaco.com.br" autocomplete="off">
+        </label>
+      </div>
+      <div class="cob-actions" style="margin-top:11px">
+        <button class="btn btn-sm" id="btnTestar">Testar conexão</button>
+        <span id="epStatus" style="font-size:13px;color:var(--fg-muted);align-self:center"></span>
+      </div>
+      <div class="notice" style="margin-top:12px">
+        <span>&#9679;</span>
+        <div>Uma página web não fala com servidor de e-mail por conta própria. O botão <strong>Enviar por e-mail</strong> entrega as mensagens a este serviço, que faz o envio pela conta da empresa. O arquivo <strong>enviar.gs</strong> do repositório traz o serviço pronto para o Google Workspace. Sem isso configurado, use <strong>Baixar .eml</strong> e envie pelo Outlook.</div>
+      </div>
+    </div>
+  </details>
+
   <section class="card" id="cobrCard" style="margin-top:13px" hidden>
     <div class="card-h">
       <h2>Cobranças por vendedor</h2>
@@ -267,7 +292,9 @@ footer{margin-top:24px;padding-top:15px;border-top:1px solid var(--border);font-
           <option value="venc">Somente títulos vencidos</option>
           <option value="all">Todos os títulos em aberto</option>
         </select>
+        <label class="sw"><input type="checkbox" id="swDetalhe"> Detalhar no corpo</label>
         <button class="btn btn-sm" id="btnEmlAll">Baixar todos (.eml)</button>
+        <button class="btn btn-sm btn-primary" id="btnEnviar">Enviar por e-mail</button>
       </div>
     </div>
     <div class="card-b"><div class="cobr" id="cobr"></div></div>
@@ -720,6 +747,42 @@ function renderMails(){
 }
 
 /* ---------- cobranças ---------- */
+function corpoResumo(nome,rows,base,arq){
+  var tot=rows.reduce(function(a,r){return a+r.v},0);
+  var porCli={};
+  rows.forEach(function(r){(porCli[r.cliente]=porCli[r.cliente]||[]).push(r)});
+  var nomes=Object.keys(porCli).sort(function(a,b){
+    var sa=porCli[a].reduce(function(x,r){return x+r.v},0),sb=porCli[b].reduce(function(x,r){return x+r.v},0);
+    return sb-sa;
+  });
+  var venc=rows.filter(function(r){return r.dias>0});
+  var ch=rows.filter(function(r){return r.origem==="cheque"});
+  var L=[];
+  L.push("Olá, "+nome+".");
+  L.push("");
+  L.push("Segue em anexo a relação de títulos em aberto da sua carteira, posição "+fmtDate(base)+".");
+  L.push("");
+  L.push("Total em aberto: "+BRL.format(tot)+" em "+rows.length+" título(s), "+nomes.length+" cliente(s).");
+  if(venc.length)L.push("Vencidos: "+BRL.format(venc.reduce(function(a,r){return a+r.v},0))+" em "+venc.length+" título(s).");
+  if(ch.length)L.push("Cheques devolvidos: "+BRL.format(ch.reduce(function(a,r){return a+r.v},0))+" em "+ch.length+" cheque(s).");
+  L.push("");
+  L.push("Clientes com maior saldo:");
+  nomes.slice(0,5).forEach(function(c,i){
+    var lista=porCli[c];
+    var st=lista.reduce(function(a,r){return a+r.v},0);
+    var maior=lista.reduce(function(a,r){return Math.max(a,r.dias)},0);
+    var tel=lista.map(function(r){return r.contato}).filter(Boolean)[0]||"sem telefone cadastrado";
+    L.push("  "+(i+1)+". "+c+" — "+BRL.format(st)+" — "+(maior>0?maior+" dias de atraso":"a vencer")+" — "+tel);
+  });
+  if(nomes.length>5)L.push("  e mais "+(nomes.length-5)+" cliente(s) na planilha.");
+  L.push("");
+  L.push("A planilha "+arq+" tem duas abas: Resumo por cliente, com telefone e saldo, e Títulos, com o detalhe de cada documento.");
+  L.push("");
+  L.push("Por favor, entre em contato com cada cliente e registre o retorno: data de pagamento prometida, negociação em andamento ou motivo da pendência.");
+  L.push("");
+  L.push("ERV Consultoria");
+  return L.join("\n");
+}
 function corpoEmail(nome,rows,base){
   var tot=rows.reduce(function(a,r){return a+r.v},0);
   var porCli={};
@@ -766,7 +829,7 @@ function corpoEmail(nome,rows,base){
 }
 function renderCobr(){
   calcular();
-  var base=baseDate(),esc0=$("#cobEscopo").value;
+  var base=baseDate(),esc0=$("#cobEscopo").value,det=$("#swDetalhe").checked;
   var alvo=escopo().filter(function(r){return esc0==="all"?true:r.dias>0});
   var vs=porVendedor(alvo);
   if(!vs.length){$("#cobr").innerHTML='<div class="empty">Nenhum título no escopo selecionado.</div>';return}
@@ -774,7 +837,8 @@ function renderCobr(){
     var rows=alvo.filter(function(r){return r.vendedor===v.nome});
     var mail=mailDe(v);
     var assunto="Cobrança — títulos em aberto — "+v.nome+" — posição "+fmtDate(base);
-    var corpo=corpoEmail(v.nome,rows,base);
+    var pl=planilhaVendedor(v.nome,rows,base);
+    var corpo=det?corpoEmail(v.nome,rows,base):corpoResumo(v.nome,rows,base,pl.arquivo);
     return '<div class="cob">'+
       '<div class="cob-h"><span class="nm">'+esc(v.nome)+'</span>'+
         '<span class="to'+(mail?"":" miss")+'">'+esc(mail||"sem e-mail cadastrado")+'</span>'+
@@ -785,16 +849,21 @@ function renderCobr(){
         '<div class="cob-actions">'+
           '<button class="btn btn-sm" data-copy="#as'+i+'">Copiar assunto</button>'+
           '<button class="btn btn-sm btn-primary" data-copy="#cp'+i+'">Copiar mensagem</button>'+
+          '<button class="btn btn-sm" data-xls="'+i+'">Baixar planilha</button>'+
           (mail?'<button class="btn btn-sm" data-eml="'+i+'">Baixar .eml</button>':"")+
           (mail?'<button class="btn btn-sm" data-mailto="'+i+'">Abrir no e-mail</button>':"")+
           (mail?'<button class="btn btn-sm" data-copy-text="'+esc(mail)+'">Copiar endereço</button>':"")+
         '</div></div></div>';
   }).join("");
-  state.cobrancas=vs.map(function(v,i){
+  state.cobrancas=vs.map(function(v){
     var rows=alvo.filter(function(r){return r.vendedor===v.nome});
-    return {nome:v.nome,mail:mailDe(v),
+    var pl=planilhaVendedor(v.nome,rows,base);
+    return {nome:v.nome,mail:mailDe(v),rows:rows,planilha:pl,
       assunto:"Cobrança — títulos em aberto — "+v.nome+" — posição "+fmtDate(base),
-      corpo:corpoEmail(v.nome,rows,base)};
+      corpo:det?corpoEmail(v.nome,rows,base):corpoResumo(v.nome,rows,base,pl.arquivo)};
+  });
+  Array.prototype.forEach.call($("#cobr").querySelectorAll("[data-xls]"),function(b){
+    b.addEventListener("click",function(){baixarXlsx(+b.getAttribute("data-xls"))});
   });
   Array.prototype.forEach.call($("#cobr").querySelectorAll("[data-eml]"),function(b){
     b.addEventListener("click",function(){baixarEml(+b.getAttribute("data-eml"))});
@@ -823,6 +892,68 @@ function renderCobr(){
   });
 }
 
+/* ---------- planilha por vendedor ---------- */
+var MIME_XLSX="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+function serial(d){
+  if(!d)return "";
+  return Math.round((Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())-Date.UTC(1899,11,30))/86400000);
+}
+function formula(f){return {t:"n",v:0,f:f}}
+function planilhaVendedor(nome,rows,base){
+  var ord=rows.slice().sort(function(a,b){
+    return String(a.cliente).localeCompare(String(b.cliente),"pt-BR")||b.dias-a.dias;
+  });
+  var cab=["Cliente","Código","Telefone","E-mail do cliente","Empresa","Origem","Documento","Parcela",
+           "Emissão","Vencimento","Dias em atraso","Faixa","Valor","Multa","Juros","Motivo da devolução"];
+  var aoa=[cab];
+  ord.forEach(function(r){
+    aoa.push([r.cliente,r.cod,r.contato,r.mailCli,r.empresa,ORIGENS[r.origem].rot,r.doc,r.pc,
+      serial(r.emissao),serial(r.venc),r.dias,FAIXAS[r.faixa].nome,r.v,r.multa,r.juros,r.motivo]);
+  });
+  var n=aoa.length;
+  aoa.push(["TOTAL","","","","","","","","","","","",formula("SUM(M2:M"+n+")"),
+            formula("SUM(N2:N"+n+")"),formula("SUM(O2:O"+n+")"),""]);
+  var ws=XLSX.utils.aoa_to_sheet(aoa);
+  ws["!cols"]=[{wch:36},{wch:8},{wch:22},{wch:28},{wch:20},{wch:18},{wch:12},{wch:8},
+               {wch:11},{wch:11},{wch:13},{wch:16},{wch:14},{wch:11},{wch:11},{wch:22}];
+  ws["!autofilter"]={ref:"A1:P"+n};
+  for(var l=2;l<=n+1;l++){
+    ["I","J"].forEach(function(c){var cel=ws[c+l];if(cel&&cel.t==="n")cel.z="dd/mm/yyyy"});
+    ["M","N","O"].forEach(function(c){var cel=ws[c+l];if(cel&&cel.t==="n")cel.z='R$ #,##0.00'});
+    var cd=ws["K"+l];if(cd&&cd.t==="n")cd.z="0";
+  }
+  // aba resumo por cliente
+  var porCli={};
+  ord.forEach(function(r){(porCli[r.cliente]=porCli[r.cliente]||[]).push(r)});
+  var rk=Object.keys(porCli).sort(function(a,b){
+    return porCli[b].reduce(function(x,r){return x+r.v},0)-porCli[a].reduce(function(x,r){return x+r.v},0);
+  });
+  var r2=[["Cliente","Telefone","E-mail do cliente","Títulos","Valor total","Maior atraso (dias)","Cheques devolvidos"]];
+  rk.forEach(function(c){
+    var li=porCli[c];
+    r2.push([c,
+      li.map(function(r){return r.contato}).filter(Boolean)[0]||"",
+      li.map(function(r){return r.mailCli}).filter(Boolean)[0]||"",
+      li.length,
+      li.reduce(function(a,r){return a+r.v},0),
+      li.reduce(function(a,r){return Math.max(a,r.dias)},0),
+      li.filter(function(r){return r.origem==="cheque"}).reduce(function(a,r){return a+r.v},0)]);
+  });
+  var m=r2.length;
+  r2.push(["TOTAL","","",formula("SUM(D2:D"+m+")"),formula("SUM(E2:E"+m+")"),"",formula("SUM(G2:G"+m+")")]);
+  var ws2=XLSX.utils.aoa_to_sheet(r2);
+  ws2["!cols"]=[{wch:40},{wch:22},{wch:28},{wch:9},{wch:15},{wch:19},{wch:19}];
+  ws2["!autofilter"]={ref:"A1:G"+m};
+  for(var l2=2;l2<=m+1;l2++){
+    ["E","G"].forEach(function(c){var cel=ws2[c+l2];if(cel&&cel.t==="n")cel.z='R$ #,##0.00'});
+  }
+  var wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws2,"Resumo por cliente");
+  XLSX.utils.book_append_sheet(wb,ws,"Títulos");
+  var d=base,dt=d.getFullYear()+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0");
+  return {wb:wb,arquivo:"inadimplencia-"+slug(nome)+"-"+dt+".xlsx"};
+}
+
 /* ---------- downloads ---------- */
 function baixar(nome,mime,conteudo){
   var blob=new Blob([conteudo],{type:mime});
@@ -839,22 +970,41 @@ function b64(s){
 function quebra(s,n){var o=[];for(var i=0;i<s.length;i+=n)o.push(s.slice(i,i+n));return o.join("\r\n")}
 function slug(s){return String(s).normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^A-Za-z0-9]+/g,"-").replace(/^-|-$/g,"").toLowerCase()}
 function cobAtual(i){return (state.cobrancas||[])[i]}
+function baixarXlsx(i){
+  var c=cobAtual(i);if(!c)return;
+  var buf=XLSX.write(c.planilha.wb,{bookType:"xlsx",type:"array"});
+  baixar(c.planilha.arquivo,MIME_XLSX,buf);
+}
 function baixarEml(i){
   var c=cobAtual(i);if(!c)return;
   var d=baseDate();
-  var eml=[
+  var bd="ERV_"+Math.random().toString(36).slice(2,12);
+  var anexo=XLSX.write(c.planilha.wb,{bookType:"xlsx",type:"base64"});
+  var cab=[
     "To: "+c.mail,
     "Subject: =?UTF-8?B?"+b64(c.assunto)+"?=",
     "Date: "+new Date().toUTCString().replace("GMT","+0000"),
     "MIME-Version: 1.0",
+    'Content-Type: multipart/mixed; boundary="'+bd+'"',
+    "",
+    "--"+bd,
     "Content-Type: text/plain; charset=UTF-8",
     "Content-Transfer-Encoding: base64",
     "",
     quebra(b64(c.corpo),76),
+    "",
+    "--"+bd,
+    'Content-Type: '+MIME_XLSX+'; name="'+c.planilha.arquivo+'"',
+    "Content-Transfer-Encoding: base64",
+    'Content-Disposition: attachment; filename="'+c.planilha.arquivo+'"',
+    "",
+    quebra(anexo,76),
+    "",
+    "--"+bd+"--",
     ""
   ].join("\r\n");
   var dt=d.getFullYear()+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0");
-  baixar("cobranca-"+slug(c.nome)+"-"+dt+".eml","message/rfc822",eml);
+  baixar("cobranca-"+slug(c.nome)+"-"+dt+".eml","message/rfc822",cab);
 }
 function baixarTodosEml(){
   var n=(state.cobrancas||[]).length;
@@ -882,6 +1032,73 @@ function exportarCsv(){
   baixar("inadimplencia-"+dt+".csv","text/csv;charset=utf-8","\ufeff"+L.join("\r\n"));
 }
 
+/* ---------- envio automático ---------- */
+function cfgEnvio(){
+  return {url:($("#epUrl").value||"").trim(),token:($("#epToken").value||"").trim(),copia:($("#epCopia").value||"").trim()};
+}
+function salvarCfg(){try{localStorage.setItem("erv-inad-envio",JSON.stringify(cfgEnvio()))}catch(e){}}
+function carregarCfg(){
+  try{
+    var c=JSON.parse(localStorage.getItem("erv-inad-envio")||"{}");
+    $("#epUrl").value=c.url||"";$("#epToken").value=c.token||"";$("#epCopia").value=c.copia||"";
+  }catch(e){}
+}
+function status(txt,tipo){
+  var el=$("#epStatus");el.textContent=txt;
+  el.style.color=tipo==="erro"?"var(--crit)":(tipo==="ok"?"var(--ok)":"var(--fg-muted)");
+}
+function postar(payload){
+  var c=cfgEnvio();
+  return fetch(c.url,{
+    method:"POST",
+    headers:{"Content-Type":"text/plain;charset=utf-8"},
+    body:JSON.stringify(payload)
+  }).then(function(r){return r.text()}).then(function(t){
+    var j;try{j=JSON.parse(t)}catch(e){throw new Error("resposta inesperada do serviço")}
+    if(!j.ok)throw new Error(j.erro||"o serviço recusou o pedido");
+    return j;
+  });
+}
+function testarEnvio(){
+  var c=cfgEnvio();
+  if(!c.url){status("Informe o endereço do serviço.","erro");return}
+  salvarCfg();status("Testando...");
+  postar({token:c.token,teste:true}).then(function(j){
+    status("Conexão confirmada"+(j.conta?" — envia como "+j.conta:"")+".","ok");
+  }).catch(function(e){status("Falhou: "+(e.message||e),"erro")});
+}
+function enviarTodos(){
+  var b=$("#btnEnviar"),c=cfgEnvio();
+  if(!c.url){$("#envioCard").open=true;status("Configure o serviço de envio antes.","erro");
+    $("#envioCard").scrollIntoView({behavior:"smooth",block:"center"});return}
+  var msgs=(state.cobrancas||[]).filter(function(x){return x.mail});
+  var sem=(state.cobrancas||[]).length-msgs.length;
+  if(!msgs.length){status("Nenhum vendedor com e-mail cadastrado.","erro");return}
+  if(b.getAttribute("data-armado")!=="1"){
+    b.setAttribute("data-armado","1");
+    b.textContent="Confirmar envio de "+msgs.length+" e-mail(s)"+(sem?" ("+sem+" sem endereço)":"");
+    setTimeout(function(){
+      if(b.getAttribute("data-armado")==="1"){b.removeAttribute("data-armado");b.textContent="Enviar por e-mail"}
+    },8000);
+    return;
+  }
+  b.removeAttribute("data-armado");b.disabled=true;b.textContent="Enviando...";
+  salvarCfg();status("Enviando "+msgs.length+" mensagem(ns)...");
+  postar({
+    token:c.token,copia:c.copia,
+    mensagens:msgs.map(function(x){
+      return {para:x.mail,assunto:x.assunto,corpo:x.corpo,
+        anexo:{nome:x.planilha.arquivo,mime:MIME_XLSX,base64:XLSX.write(x.planilha.wb,{bookType:"xlsx",type:"base64"})}};
+    })
+  }).then(function(j){
+    status("Enviado para "+(j.enviados||[]).length+" vendedor(es) às "+new Date().toLocaleTimeString("pt-BR")+".","ok");
+    b.textContent="Enviado";setTimeout(function(){b.textContent="Enviar por e-mail";b.disabled=false},4000);
+  }).catch(function(e){
+    status("Não enviou: "+(e.message||e)+". Use Baixar .eml e envie pelo Outlook.","erro");
+    b.textContent="Enviar por e-mail";b.disabled=false;
+  });
+}
+
 /* ---------- eventos ---------- */
 (function(){var d=stripTime(new Date());$("#baseDate").value=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")})();
 $("#baseDate").addEventListener("change",function(){render();if(!$("#cobrCard").hidden)renderCobr()});
@@ -897,6 +1114,10 @@ $("#btnClearV").addEventListener("click",function(){$("#fVend").value="";render(
 $("#cobEscopo").addEventListener("change",renderCobr);
 $("#btnCsv").addEventListener("click",exportarCsv);
 $("#btnEmlAll").addEventListener("click",baixarTodosEml);
+$("#swDetalhe").addEventListener("change",renderCobr);
+$("#btnEnviar").addEventListener("click",enviarTodos);
+$("#btnTestar").addEventListener("click",testarEnvio);
+["#epUrl","#epToken","#epCopia"].forEach(function(id){$(id).addEventListener("change",salvarCfg)});
 $("#btnCobrar").addEventListener("click",function(){
   var c=$("#cobrCard");c.hidden=false;renderCobr();
   c.scrollIntoView({behavior:"smooth",block:"start"});
@@ -910,6 +1131,7 @@ Array.prototype.forEach.call(document.querySelectorAll("th[data-sort]"),function
 });
 
 carregarEmails();
+carregarCfg();
 render();
 })();
 </script>
