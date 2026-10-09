@@ -165,6 +165,48 @@ details>summary:hover{color:var(--heading)}
 textarea{width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:10px 11px;font-family:ui-monospace,"Cascadia Mono",Menlo,Consolas,monospace;font-size:12px;line-height:1.55;resize:vertical;min-height:230px}
 .subject{background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:7px 11px;font-size:13px;user-select:all;overflow-wrap:anywhere}
 .cob-actions{display:flex;gap:7px;flex-wrap:wrap}
+/* ---------- abas ---------- */
+.tabs{display:flex;gap:2px;flex-wrap:wrap;border-bottom:1px solid var(--border);background:var(--surface)}
+.tabs-in{max-width:1240px;margin:0 auto;padding-inline:16px;display:flex;gap:2px;flex-wrap:wrap;width:100%}
+.tab{border:0;border-bottom:2px solid transparent;background:none;padding:10px 14px;font-family:var(--f-display);font-weight:600;font-size:13.5px;color:var(--fg-muted);cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+.tab:hover{color:var(--heading)}
+.tab[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
+.tab .pill{background:var(--accent-soft);color:var(--accent);border-radius:999px;padding:0 7px;font-size:11.5px;font-weight:700;font-variant-numeric:tabular-nums}
+.tab .pill.alert{background:var(--crit);color:#fff}
+
+/* ---------- acompanhamento ---------- */
+.nt{display:inline-flex;align-items:center;gap:5px;border:1px solid currentColor;border-radius:999px;padding:1px 8px;font-size:11px;font-weight:700;white-space:nowrap}
+.btn-nt{border:1px dashed var(--border);background:none;border-radius:999px;padding:1px 9px;font-size:11px;font-weight:700;color:var(--fg-muted);cursor:pointer;white-space:nowrap}
+.btn-nt:hover{border-style:solid;border-color:var(--accent);color:var(--accent)}
+td.ac{white-space:normal;min-width:150px}
+td.ac small{display:block;color:var(--fg-muted);font-size:11px;margin-top:2px;overflow-wrap:anywhere}
+.acs{display:flex;flex-direction:column;gap:10px}
+.ac-item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;border:1px solid var(--border);border-left:3px solid var(--border);border-radius:9px;padding:11px 13px;background:var(--surface)}
+.ac-item .cab{font-weight:700;font-size:14px;min-width:0;overflow-wrap:anywhere}
+.ac-item .cab small{font-weight:400;color:var(--fg-muted)}
+.ac-item .dir{text-align:right;display:flex;flex-direction:column;gap:4px;align-items:flex-end}
+.ac-item .txt{grid-column:1/-1;font-size:13.5px;white-space:pre-wrap;overflow-wrap:anywhere}
+.ac-item .pe{grid-column:1/-1;font-size:11.5px;color:var(--fg-muted);font-variant-numeric:tabular-nums}
+.ac-item .acoes{grid-column:1/-1;display:flex;gap:7px;flex-wrap:wrap;margin-top:3px}
+.ac-item.atrasada{border-left-color:var(--crit)}
+.ac-item.hoje{border-left-color:var(--warn)}
+.ac-item.ok{border-left-color:var(--ok)}
+.hist{grid-column:1/-1;border-top:1px dashed var(--border);margin-top:5px;padding-top:6px;display:flex;flex-direction:column;gap:3px}
+.hist div{font-size:11.5px;color:var(--fg-muted);overflow-wrap:anywhere}
+
+/* ---------- modal ---------- */
+.ov{position:fixed;inset:0;background:rgba(6,20,28,.55);display:flex;align-items:flex-start;justify-content:center;padding:20px 16px;overflow-y:auto;z-index:80}
+.ov[hidden]{display:none!important}
+.dlg{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.35);width:100%;max-width:560px;margin-block:auto}
+.dlg-h{padding:14px 16px;border-bottom:1px solid var(--border)}
+.dlg-h h3{font-size:16px;color:var(--heading);overflow-wrap:anywhere}
+.dlg-h .sub{font-size:12.5px;color:var(--fg-muted);margin-top:3px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.dlg-b{padding:14px 16px;display:flex;flex-direction:column;gap:12px}
+.dlg-b textarea{min-height:92px;font-family:var(--f-body);font-size:14px}
+.dlg-f{padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.dlg-f .sp{margin-left:auto}
+.row2{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.field label{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--fg-muted)}
 footer{margin-top:24px;padding-top:15px;border-top:1px solid var(--border);font-size:12.5px;color:var(--fg-muted)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -193,10 +235,17 @@ footer{margin-top:24px;padding-top:15px;border-top:1px solid var(--border);font-
   </div>
 </div>
 
+<nav class="tabs"><div class="tabs-in" role="tablist">
+  <button class="tab" id="tabPainel" role="tab" aria-selected="true" aria-controls="vPainel">Painel</button>
+  <button class="tab" id="tabAcomp" role="tab" aria-selected="false" aria-controls="vAcomp">Acompanhamento <span class="pill" id="pillAcomp">0</span></button>
+  <button class="tab" id="tabCobr" role="tab" aria-selected="false" aria-controls="vCobr">Cobranças</button>
+</div></nav>
+
 <div class="wrap">
   <div class="files" id="files"></div>
   <div id="avisos"></div>
 
+  <div id="vPainel" role="tabpanel">
   <div class="kpis" id="kpis"></div>
 
   <div class="grid2">
@@ -216,7 +265,7 @@ footer{margin-top:24px;padding-top:15px;border-top:1px solid var(--border);font-
   <section class="card" style="margin-top:13px">
     <div class="orgs" id="orgs"></div>
     <div class="toolbar">
-      <div class="grow"><input type="text" id="q" placeholder="Buscar cliente, documento ou telefone" style="width:100%"></div>
+      <div class="grow"><input type="text" id="q" placeholder="Buscar cliente, código, documento ou telefone" style="width:100%"></div>
       <select id="fVend"><option value="">Todos os vendedores</option></select>
       <select id="fEmp"><option value="">Todas as empresas</option></select>
       <select id="fFaixa">
@@ -234,11 +283,13 @@ footer{margin-top:24px;padding-top:15px;border-top:1px solid var(--border);font-
         <thead><tr>
           <th data-sort="vendedor">Vendedor</th>
           <th data-sort="cliente">Cliente</th>
+          <th data-sort="cod" class="r">Cód.</th>
           <th data-sort="origem">Origem</th>
           <th data-sort="doc">Documento</th>
           <th data-sort="venc">Vencimento</th>
           <th data-sort="dias" class="r">Atraso</th>
           <th data-sort="contato">Contato</th>
+          <th data-sort="acomp">Acompanhamento</th>
           <th data-sort="valor" class="r">Valor</th>
         </tr></thead>
         <tbody id="tbody"></tbody>
@@ -247,6 +298,36 @@ footer{margin-top:24px;padding-top:15px;border-top:1px solid var(--border);font-
     </div>
     <div class="empty" id="tEmpty" hidden>Nenhum título com os filtros aplicados.</div>
   </section>
+  </div><!-- /vPainel -->
+
+  <div id="vAcomp" role="tabpanel" hidden>
+    <div class="kpis" id="acKpis"></div>
+    <section class="card" style="margin-top:13px">
+      <div class="toolbar">
+        <div class="grow"><input type="text" id="acQ" placeholder="Buscar cliente, código, documento ou texto da anotação" style="width:100%"></div>
+        <select id="acVend"><option value="">Todos os vendedores</option></select>
+        <select id="acSit">
+          <option value="">Todas as situações</option>
+          <option value="abertas">Em acompanhamento</option>
+          <option value="vencidas">Promessa vencida</option>
+          <option value="hoje">Vence hoje ou amanhã</option>
+          <option value="prometido">Prometeu pagar</option>
+          <option value="negociando">Negociando</option>
+          <option value="semcontato">Sem contato</option>
+          <option value="contesta">Contesta o título</option>
+          <option value="juridico">Enviar ao jurídico</option>
+          <option value="pago">Pagamento confirmado</option>
+        </select>
+        <button class="btn btn-sm" id="acXls">Exportar Excel</button>
+        <button class="btn btn-sm" id="acBkp">Backup</button>
+        <button class="btn btn-sm" id="acRest">Restaurar</button>
+        <input type="file" id="acFile" accept=".json" class="sr">
+      </div>
+      <div class="card-b"><div class="acs" id="acList"></div></div>
+    </section>
+  </div><!-- /vAcomp -->
+
+  <div id="vCobr" role="tabpanel" hidden>
 
   <details class="card" id="mailCard">
     <summary>E-mails dos vendedores</summary>
@@ -284,7 +365,7 @@ footer{margin-top:24px;padding-top:15px;border-top:1px solid var(--border);font-
     </div>
   </details>
 
-  <section class="card" id="cobrCard" style="margin-top:13px" hidden>
+  <section class="card" id="cobrCard" style="margin-top:13px">
     <div class="card-h">
       <h2>Cobranças por vendedor</h2>
       <div class="ctl">
@@ -297,11 +378,57 @@ footer{margin-top:24px;padding-top:15px;border-top:1px solid var(--border);font-
         <button class="btn btn-sm btn-primary" id="btnEnviar">Enviar por e-mail</button>
       </div>
     </div>
-    <div class="card-b"><div class="cobr" id="cobr"></div></div>
+    <div class="card-b">
+      <div id="cobrAviso" hidden></div>
+      <div class="cobr" id="cobr"></div>
+    </div>
   </section>
+  </div><!-- /vCobr -->
+
+  <div class="ov" id="ntOv" hidden>
+    <div class="dlg" role="dialog" aria-modal="true" aria-labelledby="ntTit">
+      <div class="dlg-h">
+        <h3 id="ntTit">Anotação</h3>
+        <div class="sub" id="ntSub"></div>
+      </div>
+      <div class="dlg-b">
+        <div class="row2">
+          <div class="field">
+            <label for="ntSit">Situação</label>
+            <select id="ntSit">
+              <option value="prometido">Prometeu pagar</option>
+              <option value="negociando">Negociando</option>
+              <option value="semcontato">Sem contato</option>
+              <option value="contesta">Contesta o título</option>
+              <option value="juridico">Enviar ao jurídico</option>
+              <option value="pago">Pagamento confirmado</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="ntData">Data prometida</label>
+            <input type="date" id="ntData">
+          </div>
+          <div class="field">
+            <label for="ntQuem">Informado por</label>
+            <input type="text" id="ntQuem" placeholder="nome do vendedor" autocomplete="off">
+          </div>
+        </div>
+        <div class="field">
+          <label for="ntTxt">O que o cliente disse</label>
+          <textarea id="ntTxt" placeholder="Ex.: cliente avisou que paga dia 20, depois do recebimento da obra. Pediu boleto novo por e-mail." spellcheck="true"></textarea>
+        </div>
+        <div id="ntHist"></div>
+      </div>
+      <div class="dlg-f">
+        <button class="btn btn-primary" id="ntSalvar">Salvar</button>
+        <button class="btn" id="ntFechar">Cancelar</button>
+        <button class="btn sp" id="ntApagar">Apagar anotação</button>
+      </div>
+    </div>
+  </div>
 
   <footer>
-    Fase 1 — leitura dos relatórios MTR3761 (boletos), MTR3762 (carteira e pedidos) e CQC2043 (cheques devolvidos) exportados do VIMAN. Linhas de totalização dos relatórios são descartadas e títulos repetidos entre arquivos contam uma vez só. A fase 2 substitui a importação pela consulta ao MySQL e pelo envio automático dos e-mails.
+    Fase 1 — leitura dos relatórios MTR3761 (boletos), MTR3762 (carteira e pedidos) e CQC2043 (cheques devolvidos) exportados do VIMAN. Linhas de totalização dos relatórios são descartadas e títulos repetidos entre arquivos contam uma vez só. As anotações de acompanhamento ficam salvas neste navegador — use <strong>Backup</strong> na aba Acompanhamento para guardá-las em arquivo. A fase 2 substitui a importação pela consulta ao MySQL, passa as anotações para o banco e automatiza o envio dos e-mails.
   </footer>
 </div>
 
@@ -335,7 +462,16 @@ var FAIXAS=[
  {k:4,nome:"Mais de 90 dias",desc:"renegociar ou provisionar",cor:"var(--crit)"}
 ];
 
-var state={arquivos:[],rows:[],sort:{key:"dias",dir:-1},vfilter:"",emails:{},orgOff:{},avisos:[]};
+var SITS={
+ prometido:{rot:"Prometeu pagar",curto:"Prometeu",cor:"var(--ok)",aberta:true,prazo:true},
+ negociando:{rot:"Negociando",curto:"Negociando",cor:"var(--warn)",aberta:true,prazo:true},
+ semcontato:{rot:"Sem contato",curto:"Sem contato",cor:"var(--high)",aberta:true,prazo:false},
+ contesta:{rot:"Contesta o título",curto:"Contesta",cor:"var(--high)",aberta:true,prazo:false},
+ juridico:{rot:"Enviar ao jurídico",curto:"Jurídico",cor:"var(--crit)",aberta:true,prazo:false},
+ pago:{rot:"Pagamento confirmado",curto:"Pago",cor:"var(--ok)",aberta:false,prazo:false}
+};
+var state={arquivos:[],rows:[],sort:{key:"dias",dir:-1},vfilter:"",emails:{},orgOff:{},avisos:[],
+           notas:{},aba:"painel",ntChave:null};
 
 /* ---------- utilidades ---------- */
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
@@ -485,6 +621,45 @@ function normalizar(tab,nomeArq){
   return out;
 }
 
+/* ---------- anotações ---------- */
+function chaveNota(r){return [r.origem,r.cod,r.doc,r.pc].join("~")}
+function carregarNotas(){
+  try{var x=localStorage.getItem("erv-inad-notas-sj");state.notas=x?(JSON.parse(x)||{}):{}}
+  catch(e){state.notas={}}
+}
+function salvarNotas(){
+  try{localStorage.setItem("erv-inad-notas-sj",JSON.stringify(state.notas))}
+  catch(e){alert0("Não foi possível salvar a anotação neste navegador. Use o botão Backup para não perder o que já foi registrado.")}
+}
+function alert0(msg){
+  var el=document.getElementById("avisos");
+  if(!el)return;
+  var d=document.createElement("div");
+  d.className="notice err";
+  d.innerHTML='<span>&#9679;</span><div><strong>Atenção.</strong> '+esc(msg)+'</div>';
+  el.appendChild(d);
+}
+function notaDe(r){return state.notas[chaveNota(r)]||null}
+function situacaoNota(n,base){
+  if(!n)return {classe:"",rotulo:"",dias:null};
+  var S=SITS[n.situacao]||SITS.negociando;
+  if(!S.aberta)return {classe:"ok",rotulo:S.rot,dias:null};
+  if(!n.data)return {classe:"",rotulo:S.rot,dias:null};
+  var d=parseDate(n.data);
+  if(!d)return {classe:"",rotulo:S.rot,dias:null};
+  var dd=Math.round((d-base)/86400000);
+  if(dd<0)return {classe:"atrasada",rotulo:S.rot,dias:dd};
+  if(dd<=1)return {classe:"hoje",rotulo:S.rot,dias:dd};
+  return {classe:"",rotulo:S.rot,dias:dd};
+}
+function notasAtivas(){
+  // só as anotações que ainda correspondem a um título carregado
+  var vivos={};state.rows.forEach(function(r){vivos[chaveNota(r)]=r});
+  return Object.keys(state.notas).map(function(k){
+    return {chave:k,nota:state.notas[k],row:vivos[k]||null};
+  });
+}
+
 /* ---------- consolidação ---------- */
 function consolidar(){
   var vistos={},rows=[],dups=0;
@@ -505,6 +680,9 @@ function calcular(){
     r.faixa=faixaDe(r.dias);
     r.v=valorDe(r);
     r.contato=fone(r);
+    var n=notaDe(r);
+    r.nota=n;
+    r.acomp=n?((SITS[n.situacao]||SITS.negociando).curto+(n.data?" "+n.data:"")):"";
   });
 }
 function noEscopo(r){
@@ -520,7 +698,7 @@ function filtradas(){
     if(fe&&r.empresa!==fe)return false;
     if(ff==="venc"){if(r.dias<=0)return false}
     else if(ff!==""){if(r.faixa!==+ff)return false}
-    if(q&&norm(r.cliente+" "+r.doc+" "+r.pc+" "+r.contato).indexOf(q)<0)return false;
+    if(q&&norm(r.cliente+" "+r.cod+" "+r.doc+" "+r.pc+" "+r.contato).indexOf(q)<0)return false;
     return true;
   });
 }
@@ -604,7 +782,18 @@ function renderFiles(){
 
 /* ---------- render ---------- */
 function render(){
-  calcular();renderFiles();renderAvisos();renderKpis();renderAging();renderVend();renderOrgs();renderTabela();renderMails();
+  calcular();renderFiles();renderAvisos();renderKpis();renderAging();renderVend();renderOrgs();renderTabela();renderMails();renderAcomp();
+  if(state.aba==="cobr")renderCobr();
+}
+function trocarAba(a){
+  state.aba=a;
+  [["painel","#tabPainel","#vPainel"],["acomp","#tabAcomp","#vAcomp"],["cobr","#tabCobr","#vCobr"]].forEach(function(t){
+    var sel=t[0]===a;
+    $(t[1]).setAttribute("aria-selected",sel?"true":"false");
+    $(t[2]).hidden=!sel;
+  });
+  if(a==="cobr")renderCobr();
+  window.scrollTo({top:0,behavior:"smooth"});
 }
 function renderKpis(){
   var rows=escopo();
@@ -698,15 +887,20 @@ function renderTabela(){
   $("#tbody").innerHTML=rows.slice(0,600).map(function(r){
     var f=FAIXAS[r.faixa],o=ORIGENS[r.origem];
     var txt=r.dias>0?NUM.format(r.dias)+" d":(r.venc?"a vencer":"—");
-    return "<tr><td>"+esc(r.vendedor)+'</td><td class="cli">'+esc(r.cliente)+"</td>"+
+    return '<tr data-k="'+esc(chaveNota(r))+'"><td>'+esc(r.vendedor)+'</td><td class="cli">'+esc(r.cliente)+"</td>"+
+      '<td class="r num">'+esc(r.cod||"\u2014")+"</td>"+
       '<td><span class="badge" style="color:'+o.cor+'">'+esc(o.curto)+"</span></td>"+
       "<td>"+esc(r.doc)+(r.pc&&r.pc!=="0"?" "+esc(r.pc):"")+'</td><td class="num">'+fmtDate(r.venc)+
       '</td><td class="r"><span class="badge" style="color:'+f.cor+'">'+txt+'</span></td>'+
       '<td class="num">'+esc(r.contato||"—")+'</td>'+
+      '<td class="ac">'+celulaAcomp(r)+'</td>'+
       '<td class="r num">'+BRL.format(r.v)+"</td></tr>";
   }).join("");
+  Array.prototype.forEach.call($("#tbody").querySelectorAll("[data-nt]"),function(b){
+    b.addEventListener("click",function(ev){ev.stopPropagation();abrirNota(b.getAttribute("data-nt"))});
+  });
   $("#tEmpty").hidden=rows.length>0;
-  $("#tfoot").innerHTML=rows.length?'<tr><td colspan="6">'+NUM.format(rows.length)+' títulos'+(rows.length>600?" (mostrando os 600 primeiros)":"")+'</td><td></td><td class="r num">'+BRL.format(tot)+"</td></tr>":"";
+  $("#tfoot").innerHTML=rows.length?'<tr><td colspan="8">'+NUM.format(rows.length)+' títulos'+(rows.length>600?" (mostrando os 600 primeiros)":"")+'</td><td></td><td class="r num">'+BRL.format(tot)+"</td></tr>":"";
   preencherSelects();
 }
 function preencherSelects(){
@@ -719,6 +913,290 @@ function preencherSelects(){
   var le=Object.keys(emps).sort();
   se.innerHTML='<option value="">Todas as empresas</option>'+le.map(function(n){return '<option value="'+esc(n)+'">'+esc(n)+"</option>"}).join("");
   se.value=le.indexOf(ea)>=0?ea:"";
+}
+
+/* ---------- acompanhamento: celula e lista ---------- */
+function celulaAcomp(r){
+  var n=r.nota;
+  if(!n)return '<button class="btn-nt" data-nt="'+esc(chaveNota(r))+'">+ anotar</button>';
+  var st=situacaoNota(n,baseDate());
+  var S=SITS[n.situacao]||SITS.negociando;
+  var extra="";
+  if(n.data){
+    var dd=st.dias;
+    extra=" "+fmtDate(parseDate(n.data));
+    if(dd!==null&&S.aberta){
+      if(dd<0)extra+=" (atrasou "+Math.abs(dd)+"d)";
+      else if(dd===0)extra+=" (hoje)";
+      else if(dd===1)extra+=" (amanhã)";
+    }
+  }
+  var cor=st.classe==="atrasada"?"var(--crit)":(st.classe==="hoje"?"var(--warn)":S.cor);
+  return '<button class="btn-nt" data-nt="'+esc(chaveNota(r))+'" style="border-style:solid;border-color:'+cor+';color:'+cor+'">'+
+    esc(S.curto+extra)+'</button>'+
+    (n.texto?'<small>'+esc(n.texto.length>90?n.texto.slice(0,90)+"\u2026":n.texto)+'</small>':"");
+}
+function renderAcomp(){
+  var base=baseDate();
+  var itens=notasAtivas();
+  var q=norm($("#acQ").value),fv=$("#acVend").value,fs=$("#acSit").value;
+
+  // indicadores
+  var abertas=itens.filter(function(x){return (SITS[x.nota.situacao]||{}).aberta});
+  var atrasadas=abertas.filter(function(x){return situacaoNota(x.nota,base).classe==="atrasada"});
+  var proximas=abertas.filter(function(x){return situacaoNota(x.nota,base).classe==="hoje"});
+  var pagos=itens.filter(function(x){return x.nota.situacao==="pago"});
+  var valOf=function(a){return a.reduce(function(t,x){return t+(x.row?x.row.v:0)},0)};
+  var g=[
+    {k:"Em acompanhamento",v:NUM.format(abertas.length),s:BRL.format(valOf(abertas))+" com anotação aberta"},
+    {k:"Promessa vencida",v:NUM.format(atrasadas.length),s:BRL.format(valOf(atrasadas))+" passou da data",crit:true},
+    {k:"Vence hoje ou amanhã",v:NUM.format(proximas.length),s:BRL.format(valOf(proximas))+" a confirmar"},
+    {k:"Pagamento confirmado",v:NUM.format(pagos.length),s:BRL.format(valOf(pagos))+" a baixar no ERP",ok:true}
+  ];
+  $("#acKpis").innerHTML=g.map(function(x){
+    return '<div class="kpi'+(x.crit?" crit":"")+(x.ok?" ok":"")+'"><div class="k">'+esc(x.k)+'</div><div class="v">'+esc(x.v)+'</div><div class="s">'+esc(x.s)+'</div></div>';
+  }).join("");
+
+  // pill da aba
+  var pill=$("#pillAcomp");
+  pill.textContent=NUM.format(abertas.length);
+  pill.className="pill"+(atrasadas.length?" alert":"");
+  pill.title=atrasadas.length?atrasadas.length+" promessa(s) vencida(s)":"";
+
+  // filtro de vendedores da aba
+  var sel=$("#acVend"),atual=sel.value;
+  var nomes={};itens.forEach(function(x){if(x.row)nomes[x.row.vendedor]=1});
+  var ln=Object.keys(nomes).sort(function(a,b){return a.localeCompare(b,"pt-BR")});
+  sel.innerHTML='<option value="">Todos os vendedores</option>'+ln.map(function(n){return '<option value="'+esc(n)+'">'+esc(n)+"</option>"}).join("");
+  sel.value=ln.indexOf(atual)>=0?atual:"";
+
+  var lista=itens.filter(function(x){
+    var n=x.nota,r=x.row,S=SITS[n.situacao]||SITS.negociando,st=situacaoNota(n,base);
+    if(fv&&(!r||r.vendedor!==fv))return false;
+    if(fs==="abertas"&&!S.aberta)return false;
+    if(fs==="vencidas"&&st.classe!=="atrasada")return false;
+    if(fs==="hoje"&&st.classe!=="hoje")return false;
+    if(fs&&["prometido","negociando","semcontato","contesta","juridico","pago"].indexOf(fs)>=0&&n.situacao!==fs)return false;
+    if(q){
+      var alvo=[n.texto,n.quem,n.cliente,n.cod,n.doc,n.pc,r?r.vendedor:""].join(" ");
+      if(norm(alvo).indexOf(q)<0)return false;
+    }
+    return true;
+  });
+
+  // ordem: promessa vencida, depois hoje, depois por data, pagos por último
+  var peso={atrasada:0,hoje:1,"":2,ok:3};
+  lista.sort(function(a,b){
+    var sa=situacaoNota(a.nota,base),sb=situacaoNota(b.nota,base);
+    var pa=peso[sa.classe],pb=peso[sb.classe];
+    if(pa!==pb)return pa-pb;
+    var da=a.nota.data||"9999-99-99",db=b.nota.data||"9999-99-99";
+    if(da!==db)return da<db?-1:1;
+    return (b.row?b.row.v:0)-(a.row?a.row.v:0);
+  });
+
+  if(!lista.length){
+    $("#acList").innerHTML='<div class="empty">'+(itens.length?
+      "Nenhuma anotação com os filtros aplicados.":
+      "Nenhuma anotação ainda. Na aba Painel, clique em <strong>+ anotar</strong> na linha do título para registrar o que o vendedor apurou com o cliente.")+'</div>';
+    return;
+  }
+  $("#acList").innerHTML=lista.map(function(x){
+    var n=x.nota,r=x.row,S=SITS[n.situacao]||SITS.negociando,st=situacaoNota(n,base);
+    var dataTxt="";
+    if(n.data){
+      var d=parseDate(n.data);
+      dataTxt=fmtDate(d);
+      if(S.aberta&&st.dias!==null){
+        if(st.dias<0)dataTxt+=" \u00b7 atrasou "+Math.abs(st.dias)+" dia(s)";
+        else if(st.dias===0)dataTxt+=" \u00b7 hoje";
+        else if(st.dias===1)dataTxt+=" \u00b7 amanhã";
+        else dataTxt+=" \u00b7 em "+st.dias+" dias";
+      }
+    }
+    var cor=st.classe==="atrasada"?"var(--crit)":(st.classe==="hoje"?"var(--warn)":S.cor);
+    var h='<div class="ac-item '+st.classe+'">'+
+      '<div class="cab">'+esc(n.cliente||"(cliente não identificado)")+
+        (n.cod?' <small>cód. '+esc(n.cod)+'</small>':"")+
+        '<small> \u00b7 '+esc((ORIGENS[n.origem]||{curto:n.origem}).curto)+" "+esc(n.doc)+(n.pc&&n.pc!=="0"?" ("+esc(n.pc)+")":"")+'</small>'+
+      '</div>'+
+      '<div class="dir"><span class="nt" style="color:'+cor+'">'+esc(S.rot)+'</span>'+
+        (r?'<span style="font-weight:700;font-variant-numeric:tabular-nums">'+BRL.format(r.v)+'</span>':
+            '<span style="font-size:11.5px;color:var(--fg-muted)">fora dos relatórios atuais</span>')+
+      '</div>';
+    if(dataTxt)h+='<div class="pe" style="color:'+cor+';font-weight:700">Data prometida: '+esc(dataTxt)+'</div>';
+    if(n.texto)h+='<div class="txt">'+esc(n.texto)+'</div>';
+    var pe=[];
+    if(r)pe.push(r.vendedor);
+    if(n.quem)pe.push("informado por "+n.quem);
+    if(r&&r.contato)pe.push(r.contato);
+    if(r&&r.venc)pe.push("venc. "+fmtDate(r.venc)+(r.dias>0?" ("+NUM.format(r.dias)+" dias)":""));
+    pe.push("anotado em "+esc(n.em||"\u2014"));
+    h+='<div class="pe">'+pe.map(esc).join(" \u00b7 ")+'</div>';
+    if(n.hist&&n.hist.length){
+      h+='<details><summary style="padding:5px 0;font-size:11px">Histórico ('+n.hist.length+')</summary><div class="hist">'+
+        n.hist.slice().reverse().map(function(e){
+          return '<div>'+esc(e.em)+" \u00b7 "+esc((SITS[e.situacao]||{rot:e.situacao}).rot)+
+            (e.data?" \u00b7 "+esc(fmtDate(parseDate(e.data))):"")+
+            (e.texto?" \u00b7 "+esc(e.texto):"")+'</div>';
+        }).join("")+'</div></details>';
+    }
+    h+='<div class="acoes"><button class="btn btn-sm" data-ed="'+esc(x.chave)+'">Editar</button>'+
+      (SITS[n.situacao]&&SITS[n.situacao].aberta?'<button class="btn btn-sm" data-pg="'+esc(x.chave)+'">Marcar como pago</button>':"")+
+      '</div>';
+    return h+'</div>';
+  }).join("");
+  Array.prototype.forEach.call($("#acList").querySelectorAll("[data-ed]"),function(b){
+    b.addEventListener("click",function(){abrirNota(b.getAttribute("data-ed"))});
+  });
+  Array.prototype.forEach.call($("#acList").querySelectorAll("[data-pg]"),function(b){
+    b.addEventListener("click",function(){
+      var k=b.getAttribute("data-pg"),n=state.notas[k];
+      if(!n)return;
+      n.hist=(n.hist||[]).concat([{em:n.em,situacao:n.situacao,data:n.data,texto:n.texto}]);
+      n.situacao="pago";n.em=agora();
+      salvarNotas();render();
+    });
+  });
+}
+
+/* ---------- modal de anotação ---------- */
+function agora(){
+  var d=new Date();
+  return String(d.getDate()).padStart(2,"0")+"/"+String(d.getMonth()+1).padStart(2,"0")+"/"+d.getFullYear()+
+    " "+String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");
+}
+function abrirNota(chave){
+  var r=null;
+  state.rows.some(function(x){if(chaveNota(x)===chave){r=x;return true}return false});
+  var n=state.notas[chave]||null;
+  if(!r&&!n)return;
+  state.ntChave=chave;
+  var cli=n?n.cliente:r.cliente, cod=n?n.cod:r.cod, doc=n?n.doc:r.doc, pc=n?n.pc:r.pc, org=n?n.origem:r.origem;
+  $("#ntTit").textContent=cli||"(cliente não identificado)";
+  var sub=[];
+  if(cod)sub.push("Código "+cod);
+  sub.push((ORIGENS[org]||{curto:org}).curto+" "+doc+(pc&&pc!=="0"?" ("+pc+")":""));
+  if(r){
+    sub.push("venc. "+fmtDate(r.venc)+(r.dias>0?" \u00b7 "+NUM.format(r.dias)+" dias de atraso":""));
+    sub.push(BRL.format(r.v));
+    if(r.contato)sub.push(r.contato);
+    sub.push(r.vendedor);
+  }else{
+    sub.push("título fora dos relatórios carregados");
+  }
+  $("#ntSub").textContent=sub.join("  \u00b7  ");
+  $("#ntSit").value=n?n.situacao:"prometido";
+  $("#ntData").value=n&&n.data?n.data:"";
+  $("#ntQuem").value=n&&n.quem?n.quem:(r?r.vendedor:"");
+  $("#ntTxt").value=n&&n.texto?n.texto:"";
+  $("#ntApagar").hidden=!n;
+  $("#ntHist").innerHTML=(n&&n.hist&&n.hist.length)?
+    '<div class="field"><label>Registros anteriores</label><div class="hist">'+
+    n.hist.slice().reverse().map(function(e){
+      return '<div>'+esc(e.em)+" \u00b7 "+esc((SITS[e.situacao]||{rot:e.situacao}).rot)+
+        (e.data?" \u00b7 "+esc(fmtDate(parseDate(e.data))):"")+(e.texto?" \u00b7 "+esc(e.texto):"")+'</div>';
+    }).join("")+'</div></div>':"";
+  $("#ntOv").hidden=false;
+  setTimeout(function(){$("#ntTxt").focus()},50);
+}
+function fecharNota(){$("#ntOv").hidden=true;state.ntChave=null}
+function salvarNota(){
+  var k=state.ntChave;if(!k)return;
+  var r=null;
+  state.rows.some(function(x){if(chaveNota(x)===k){r=x;return true}return false});
+  var ant=state.notas[k]||null;
+  var sit=$("#ntSit").value, data=$("#ntData").value, txt=$("#ntTxt").value.trim(), quem=$("#ntQuem").value.trim();
+  if(!txt&&!data&&sit==="prometido"&&!quem){fecharNota();return}
+  var hist=ant?(ant.hist||[]):[];
+  if(ant&&(ant.situacao!==sit||ant.data!==data||ant.texto!==txt)){
+    hist=hist.concat([{em:ant.em,situacao:ant.situacao,data:ant.data,texto:ant.texto}]);
+  }
+  var partes=k.split("~");
+  state.notas[k]={
+    origem:r?r.origem:partes[0],
+    cod:r?r.cod:partes[1],
+    doc:r?r.doc:partes[2],
+    pc:r?r.pc:partes[3],
+    cliente:r?r.cliente:(ant?ant.cliente:""),
+    situacao:sit,data:data,texto:txt,quem:quem,
+    em:agora(),hist:hist.slice(-20)
+  };
+  salvarNotas();fecharNota();render();
+}
+function apagarNota(){
+  var k=state.ntChave,b=$("#ntApagar");
+  if(!k)return;
+  if(b.getAttribute("data-armado")!=="1"){
+    b.setAttribute("data-armado","1");b.textContent="Confirmar exclusão";
+    setTimeout(function(){
+      if(b.getAttribute("data-armado")==="1"){b.removeAttribute("data-armado");b.textContent="Apagar anotação"}
+    },5000);
+    return;
+  }
+  b.removeAttribute("data-armado");b.textContent="Apagar anotação";
+  delete state.notas[k];salvarNotas();fecharNota();render();
+}
+
+/* ---------- backup e exportação das anotações ---------- */
+function backupNotas(){
+  var d=new Date();
+  var dt=d.getFullYear()+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0");
+  baixar("anotacoes-inadimplencia-"+dt+".json","application/json",
+    JSON.stringify({versao:1,gerado:agora(),notas:state.notas},null,1));
+}
+function restaurarNotas(f){
+  var fr=new FileReader();
+  fr.onload=function(e){
+    try{
+      var j=JSON.parse(e.target.result);
+      var n=j.notas||j;
+      if(typeof n!=="object"||Array.isArray(n))throw new Error("formato inesperado");
+      var novas=0,atualizadas=0;
+      Object.keys(n).forEach(function(k){
+        if(!n[k]||!n[k].situacao)return;
+        if(state.notas[k]){
+          // mantém a anotação mais recente, guardando a outra no histórico
+          var a=state.notas[k],b=n[k];
+          if((b.em||"")>(a.em||"")){
+            b.hist=(b.hist||[]).concat([{em:a.em,situacao:a.situacao,data:a.data,texto:a.texto}]).slice(-20);
+            state.notas[k]=b;atualizadas++;
+          }
+        }else{state.notas[k]=n[k];novas++}
+      });
+      salvarNotas();render();
+      alert0(NUM.format(novas)+" anotação(ões) importada(s) e "+NUM.format(atualizadas)+" atualizada(s).");
+    }catch(err){alert0("Não consegui ler esse backup: "+(err.message||err))}
+  };
+  fr.readAsText(f);
+}
+function exportarAcomp(){
+  var base=baseDate();
+  var itens=notasAtivas();
+  if(!itens.length){alert0("Não há anotações para exportar.");return}
+  var cab=["Vendedor","Cliente","Código","Origem","Documento","Parcela","Vencimento","Dias em atraso","Valor",
+           "Situação","Data prometida","Dias até a promessa","O que o cliente disse","Informado por","Anotado em","Título nos relatórios"];
+  var aoa=[cab];
+  itens.forEach(function(x){
+    var n=x.nota,r=x.row,st=situacaoNota(n,base);
+    aoa.push([r?r.vendedor:"",n.cliente,n.cod,(ORIGENS[n.origem]||{rot:n.origem}).rot,n.doc,n.pc,
+      r?serial(r.venc):"",r?r.dias:"",r?r.v:"",
+      (SITS[n.situacao]||{rot:n.situacao}).rot,
+      n.data?serial(parseDate(n.data)):"",st.dias===null?"":st.dias,
+      n.texto,n.quem,n.em,r?"sim":"não"]);
+  });
+  var ws=XLSX.utils.aoa_to_sheet(aoa);
+  ws["!cols"]=[{wch:12},{wch:36},{wch:8},{wch:18},{wch:12},{wch:8},{wch:11},{wch:13},{wch:14},
+               {wch:20},{wch:14},{wch:18},{wch:60},{wch:18},{wch:17},{wch:20}];
+  ws["!autofilter"]={ref:"A1:P"+aoa.length};
+  for(var l=2;l<=aoa.length;l++){
+    ["G","K"].forEach(function(c){var cl=ws[c+l];if(cl&&cl.t==="n")cl.z="dd/mm/yyyy"});
+    var ci=ws["I"+l];if(ci&&ci.t==="n")ci.z='R$ #,##0.00';
+  }
+  var wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,"Acompanhamento");
+  var d=baseDate(),dt=d.getFullYear()+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0");
+  baixar("acompanhamento-"+dt+".xlsx",MIME_XLSX,XLSX.write(wb,{bookType:"xlsx",type:"array"}));
 }
 
 /* ---------- e-mails ---------- */
@@ -772,11 +1250,28 @@ function corpoResumo(nome,rows,base,arq){
     var st=lista.reduce(function(a,r){return a+r.v},0);
     var maior=lista.reduce(function(a,r){return Math.max(a,r.dias)},0);
     var tel=lista.map(function(r){return r.contato}).filter(Boolean)[0]||"sem telefone cadastrado";
-    L.push("  "+(i+1)+". "+c+" — "+BRL.format(st)+" — "+(maior>0?maior+" dias de atraso":"a vencer")+" — "+tel);
+    var cod=lista.map(function(r){return r.cod}).filter(Boolean)[0]||"";
+    L.push("  "+(i+1)+". "+c+(cod?" (cód. "+cod+")":"")+" — "+BRL.format(st)+" — "+(maior>0?maior+" dias de atraso":"a vencer")+" — "+tel);
   });
   if(nomes.length>5)L.push("  e mais "+(nomes.length-5)+" cliente(s) na planilha.");
   L.push("");
-  L.push("A planilha "+arq+" tem duas abas: Resumo por cliente, com telefone e saldo, e Títulos, com o detalhe de cada documento.");
+  var comNota=rows.filter(function(r){return r.nota});
+  if(comNota.length){
+    var base2=base;
+    var atr=comNota.filter(function(r){
+      var st=situacaoNota(r.nota,base2);return st.classe==="atrasada";
+    });
+    L.push("");
+    L.push("Já em acompanhamento: "+comNota.length+" título(s)"+(atr.length?", sendo "+atr.length+" com a data prometida já vencida — priorize estes":"")+".");
+    comNota.slice(0,8).forEach(function(r){
+      var S=SITS[r.nota.situacao]||SITS.negociando;
+      L.push("  - "+r.cliente+(r.cod?" (cód. "+r.cod+")":"")+" | "+r.doc+" | "+S.rot+
+        (r.nota.data?" para "+fmtDate(parseDate(r.nota.data)):"")+(r.nota.texto?" | "+r.nota.texto:""));
+    });
+    if(comNota.length>8)L.push("  e mais "+(comNota.length-8)+" na planilha, na coluna Acompanhamento.");
+  }
+  L.push("");
+  L.push("A planilha "+arq+" tem duas abas: Resumo por cliente, com telefone e saldo, e Títulos, com o detalhe de cada documento e o acompanhamento já registrado.");
   L.push("");
   L.push("Por favor, entre em contato com cada cliente e registre o retorno: data de pagamento prometida, negociação em andamento ou motivo da pendência.");
   L.push("");
@@ -805,7 +1300,8 @@ function corpoEmail(nome,rows,base){
     var st=lista.reduce(function(a,r){return a+r.v},0);
     var tel=lista.map(function(r){return r.contato}).filter(Boolean)[0]||"";
     var mail=lista.map(function(r){return r.mailCli}).filter(Boolean)[0]||"";
-    L.push(c+"  —  "+BRL.format(st)+"  ("+lista.length+" título(s))");
+    var cod=lista.map(function(r){return r.cod}).filter(Boolean)[0]||"";
+    L.push(c+(cod?"  (cód. "+cod+")":"")+"  —  "+BRL.format(st)+"  ("+lista.length+" título(s))");
     if(tel)L.push("  Telefone: "+tel);
     if(mail)L.push("  E-mail: "+mail);
     lista.forEach(function(r){
@@ -817,6 +1313,11 @@ function corpoEmail(nome,rows,base){
         if(r.motivo)ln+=" | "+r.motivo;
       }
       L.push(ln);
+      if(r.nota){
+        var S=SITS[r.nota.situacao]||SITS.negociando;
+        L.push("      [acompanhamento] "+S.rot+(r.nota.data?" para "+fmtDate(parseDate(r.nota.data)):"")+
+          (r.nota.texto?": "+r.nota.texto:""));
+      }
     });
     L.push("");
   });
@@ -830,7 +1331,15 @@ function corpoEmail(nome,rows,base){
 function renderCobr(){
   calcular();
   var base=baseDate(),esc0=$("#cobEscopo").value,det=$("#swDetalhe").checked;
-  var alvo=escopo().filter(function(r){return esc0==="all"?true:r.dias>0});
+  var bruto=escopo().filter(function(r){return esc0==="all"?true:r.dias>0});
+  var alvo=bruto.filter(function(r){return !(r.nota&&r.nota.situacao==="pago")});
+  var pagos=bruto.length-alvo.length;
+  var av=$("#cobrAviso");
+  if(pagos){
+    av.className="notice";
+    av.innerHTML='<span>&#9679;</span><div><strong>'+NUM.format(pagos)+' título(s) com pagamento confirmado</strong> na aba Acompanhamento ficaram fora das cobranças. Dê baixa neles no VIMAN.</div>';
+    av.hidden=false;
+  }else{av.hidden=true;av.innerHTML=""}
   var vs=porVendedor(alvo);
   if(!vs.length){$("#cobr").innerHTML='<div class="empty">Nenhum título no escopo selecionado.</div>';return}
   $("#cobr").innerHTML=vs.map(function(v,i){
@@ -904,21 +1413,25 @@ function planilhaVendedor(nome,rows,base){
     return String(a.cliente).localeCompare(String(b.cliente),"pt-BR")||b.dias-a.dias;
   });
   var cab=["Cliente","Código","Telefone","E-mail do cliente","Empresa","Origem","Documento","Parcela",
-           "Emissão","Vencimento","Dias em atraso","Faixa","Valor","Multa","Juros","Motivo da devolução"];
+           "Emissão","Vencimento","Dias em atraso","Faixa","Valor","Multa","Juros","Motivo da devolução",
+           "Acompanhamento","Data prometida","Observação","Retorno do cliente","Nova data"];
   var aoa=[cab];
   ord.forEach(function(r){
+    var n=r.nota,S=n?(SITS[n.situacao]||SITS.negociando):null;
     aoa.push([r.cliente,r.cod,r.contato,r.mailCli,r.empresa,ORIGENS[r.origem].rot,r.doc,r.pc,
-      serial(r.emissao),serial(r.venc),r.dias,FAIXAS[r.faixa].nome,r.v,r.multa,r.juros,r.motivo]);
+      serial(r.emissao),serial(r.venc),r.dias,FAIXAS[r.faixa].nome,r.v,r.multa,r.juros,r.motivo,
+      S?S.rot:"",n&&n.data?serial(parseDate(n.data)):"",n&&n.texto?n.texto:"","",""]);
   });
   var n=aoa.length;
   aoa.push(["TOTAL","","","","","","","","","","","",formula("SUM(M2:M"+n+")"),
-            formula("SUM(N2:N"+n+")"),formula("SUM(O2:O"+n+")"),""]);
+            formula("SUM(N2:N"+n+")"),formula("SUM(O2:O"+n+")"),"","","","","",""]);
   var ws=XLSX.utils.aoa_to_sheet(aoa);
   ws["!cols"]=[{wch:36},{wch:8},{wch:22},{wch:28},{wch:20},{wch:18},{wch:12},{wch:8},
-               {wch:11},{wch:11},{wch:13},{wch:16},{wch:14},{wch:11},{wch:11},{wch:22}];
-  ws["!autofilter"]={ref:"A1:P"+n};
+               {wch:11},{wch:11},{wch:13},{wch:16},{wch:14},{wch:11},{wch:11},{wch:22},
+               {wch:20},{wch:14},{wch:46},{wch:46},{wch:13}];
+  ws["!autofilter"]={ref:"A1:U"+n};
   for(var l=2;l<=n+1;l++){
-    ["I","J"].forEach(function(c){var cel=ws[c+l];if(cel&&cel.t==="n")cel.z="dd/mm/yyyy"});
+    ["I","J","R","U"].forEach(function(c){var cel=ws[c+l];if(cel&&cel.t==="n")cel.z="dd/mm/yyyy"});
     ["M","N","O"].forEach(function(c){var cel=ws[c+l];if(cel&&cel.t==="n")cel.z='R$ #,##0.00'});
     var cd=ws["K"+l];if(cd&&cd.t==="n")cd.z="0";
   }
@@ -1018,14 +1531,17 @@ function baixarTodosEml(){
 }
 function exportarCsv(){
   var rows=filtradas();
-  var cab=["Vendedor","Canal","Cliente","Codigo cliente","Empresa","Origem","Documento","Parcela","Emissao","Vencimento","Dias de atraso","Faixa","Valor","Multa","Juros","Telefone","E-mail do cliente","Motivo devolucao","Arquivo"];
+  var cab=["Vendedor","Canal","Cliente","Codigo cliente","Empresa","Origem","Documento","Parcela","Emissao","Vencimento","Dias de atraso","Faixa","Valor","Multa","Juros","Telefone","E-mail do cliente","Motivo devolucao","Arquivo","Acompanhamento","Data prometida","Observacao","Informado por","Anotado em"];
   function cel(v){var s=String(v==null?"":v);return '"'+s.replace(/"/g,'""')+'"'}
   function dec(n){return String(n.toFixed(2)).replace(".",",")}
   var L=[cab.map(cel).join(";")];
   rows.forEach(function(r){
     L.push([r.vendedor,r.canal,r.cliente,r.cod,r.empresa,ORIGENS[r.origem].rot,r.doc,r.pc,
       fmtDate(r.emissao),fmtDate(r.venc),r.dias,FAIXAS[r.faixa].nome,dec(r.v),dec(r.multa),dec(r.juros),
-      r.contato,r.mailCli,r.motivo,r.arquivo].map(cel).join(";"));
+      r.contato,r.mailCli,r.motivo,r.arquivo,
+      r.nota?(SITS[r.nota.situacao]||{rot:r.nota.situacao}).rot:"",
+      r.nota&&r.nota.data?fmtDate(parseDate(r.nota.data)):"",
+      r.nota?r.nota.texto:"",r.nota?r.nota.quem:"",r.nota?r.nota.em:""].map(cel).join(";"));
   });
   var d=baseDate();
   var dt=d.getFullYear()+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0");
@@ -1118,9 +1634,30 @@ $("#swDetalhe").addEventListener("change",renderCobr);
 $("#btnEnviar").addEventListener("click",enviarTodos);
 $("#btnTestar").addEventListener("click",testarEnvio);
 ["#epUrl","#epToken","#epCopia"].forEach(function(id){$(id).addEventListener("change",salvarCfg)});
-$("#btnCobrar").addEventListener("click",function(){
-  var c=$("#cobrCard");c.hidden=false;renderCobr();
-  c.scrollIntoView({behavior:"smooth",block:"start"});
+$("#btnCobrar").addEventListener("click",function(){trocarAba("cobr")});
+$("#tabPainel").addEventListener("click",function(){trocarAba("painel")});
+$("#tabAcomp").addEventListener("click",function(){trocarAba("acomp")});
+$("#tabCobr").addEventListener("click",function(){trocarAba("cobr")});
+$("#acQ").addEventListener("input",renderAcomp);
+$("#acVend").addEventListener("change",renderAcomp);
+$("#acSit").addEventListener("change",renderAcomp);
+$("#acXls").addEventListener("click",exportarAcomp);
+$("#acBkp").addEventListener("click",backupNotas);
+$("#acRest").addEventListener("click",function(){$("#acFile").click()});
+$("#acFile").addEventListener("change",function(e){
+  var f=e.target.files&&e.target.files[0];
+  if(f)restaurarNotas(f);
+  e.target.value="";
+});
+$("#ntSalvar").addEventListener("click",salvarNota);
+$("#ntFechar").addEventListener("click",fecharNota);
+$("#ntApagar").addEventListener("click",apagarNota);
+$("#ntOv").addEventListener("click",function(e){if(e.target===$("#ntOv"))fecharNota()});
+$("#ntTxt").addEventListener("keydown",function(e){
+  if((e.ctrlKey||e.metaKey)&&e.key==="Enter"){e.preventDefault();salvarNota()}
+});
+document.addEventListener("keydown",function(e){
+  if(e.key==="Escape"&&!$("#ntOv").hidden)fecharNota();
 });
 Array.prototype.forEach.call(document.querySelectorAll("th[data-sort]"),function(th){
   th.addEventListener("click",function(){
@@ -1132,7 +1669,9 @@ Array.prototype.forEach.call(document.querySelectorAll("th[data-sort]"),function
 
 carregarEmails();
 carregarCfg();
+carregarNotas();
 render();
+trocarAba("painel");
 })();
 </script>
 </body>
